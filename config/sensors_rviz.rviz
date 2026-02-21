@@ -74,10 +74,25 @@ Visualization Manager:
       Radius: 0.02
       Reference Frame: imu_link
 
-    # ── Fused Odometry ───────────────────────────────────────────────
+    # ── Depth Cloud (3D point cloud on grid) ─────────────────────────
+    - Class: rviz_default_plugins/DepthCloud
+      Name: Depth Cloud
+      Enabled: true
+      Depth Map Topic: /camera/camera/depth/image_rect_raw
+      Color Image Topic: /camera/camera/color/image_raw
+      Depth Map Transport: raw
+      Color Transport: raw
+      Queue Size: 5
+      Occlusion Compensation: false
+      Auto Size: true
+      Style: Points
+      Color: 255; 255; 255
+      Alpha: 1
+
+    # ── Fused Odometry (disabled — enable when wheel odom is available) ─
     - Class: rviz_default_plugins/Odometry
       Name: Fused Odometry
-      Enabled: true
+      Enabled: false
       Topic:
         Value: /odometry/filtered
         Depth: 5
@@ -87,6 +102,8 @@ Visualization Manager:
       Color: 0; 170; 255
       Position Tolerance: 0.1
       Angle Tolerance: 0.1
+      Covariance:
+        Value: false
 
     # ── Grid ─────────────────────────────────────────────────────────
     - Class: rviz_default_plugins/Grid

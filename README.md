@@ -214,9 +214,32 @@ ros2 launch ros2_wit_d435 sensors.launch.py baud_rate:=115200
 
 ---
 
-## 5. Launch Commands
+## 5. Startup Scripts
 
-### 5.1 Sensors Only (testing/debugging)
+Convenience scripts that source the environment, launch nodes, and open RViz2:
+
+```bash
+# Sensors only (testing/debugging)
+./scripts/startup_sensors.sh
+./scripts/startup_sensors.sh --no-rviz
+
+# SLAM mapping (builds a map)
+./scripts/startup_mapping.sh                  # default map name: my_map
+./scripts/startup_mapping.sh office_map        # custom map name
+./scripts/startup_mapping.sh office_map --no-rviz
+
+# Navigation (uses a pre-built map)
+./scripts/startup_navigation.sh /path/to/map.yaml
+./scripts/startup_navigation.sh /path/to/map.yaml --no-rviz
+```
+
+All scripts auto-clean up on `Ctrl+C`.
+
+---
+
+## 6. Manual Launch Commands
+
+### 6.1 Sensors Only (testing/debugging)
 
 ```bash
 # Terminal 1: Launch sensors
@@ -242,7 +265,7 @@ ros2 topic hz /camera/camera/depth/image_rect_raw   # Should be ~30Hz
 ros2 topic hz /scan                                 # Should be ~30Hz
 ```
 
-### 5.2 SLAM Mapping Mode
+### 6.2 SLAM Mapping Mode
 
 Build a map of your environment:
 
@@ -265,7 +288,7 @@ To export a 2D occupancy grid for Nav2:
 ros2 run nav2_map_server map_saver_cli -f ~/maps/my_map
 ```
 
-### 5.3 Navigation Mode
+### 6.3 Navigation Mode
 
 Navigate using a pre-built map:
 
@@ -278,7 +301,7 @@ ros2 launch ros2_wit_d435 bringup.launch.py \
   map:=/home/rico/maps/my_map.yaml
 ```
 
-### 5.4 Full Bringup with Custom Sensor Mounts
+### 6.4 Full Bringup with Custom Sensor Mounts
 
 Override camera/IMU positions for your specific robot:
 
@@ -293,7 +316,7 @@ ros2 launch ros2_wit_d435 bringup.launch.py \
 
 ---
 
-## 6. Integrating with Your Robot Platform
+## 7. Integrating with Your Robot Platform
 
 Each robot platform should be a **separate ROS2 package/node** that:
 
@@ -323,7 +346,7 @@ self.odom_pub = self.create_publisher(Odometry, '/odom/wheel', 10)
 
 ---
 
-## 7. TF Frame Tree
+## 8. TF Frame Tree
 
 ```
 map
@@ -338,7 +361,7 @@ map
 
 ---
 
-## 8. Published Topics
+## 9. Published Topics
 
 | Topic | Type | Source | Description |
 |---|---|---|---|
@@ -355,25 +378,36 @@ map
 
 ---
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
-### D435i not detected
+### D435i crashes with "No such device"
+
+This is usually a **USB power issue** on the Jetson. The D435i draws ~700mA.
 
 ```bash
-# Check USB connection
-lsusb | grep Intel
-# Should show: Intel Corp. RealSense ...
-
-# Check RealSense viewer
-realsense-viewer
-
-# If "No devices found", try:
-# 1. Use a USB 3.0 port and cable
-# 2. Run: sudo apt install librealsense2-dkms
-# 3. Reboot
+# Check USB bus layout
+lsusb -t
+# D435i should be on Bus 02 (USB 3.0, 10Gbps)
+# WT901 should be on Bus 01 (USB 2.0, 480Mbps)
 ```
 
-### WT901 no data / permission denied
+**Fix:** Use a **powered USB 3.0 hub** for the D435i to ensure stable power delivery.
+
+If the camera isn't detected at all:
+```bash
+lsusb | grep Intel
+realsense-viewer
+# If "No devices found": use USB 3.0 port/cable, install librealsense2-dkms, reboot
+```
+
+### WT901 serial drops / reconnecting
+
+The `ch34x` (CH340) USB-serial driver can be flaky. Occasional drops are normal and the node auto-reconnects. If they're very frequent:
+
+1. Try a different USB 2.0 port
+2. Use a shorter USB cable
+3. Check `lsusb -t` to verify the IMU is on a separate bus from the camera
+4. Lower `update_rate` from 200 to 100 in the launch parameters
 
 ```bash
 # Check serial device exists
@@ -385,13 +419,21 @@ groups $USER  # Should include 'dialout'
 # Manual test (should show binary data):
 python3 -c "
 import serial
-s = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+s = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
 print(s.read(44).hex())
 s.close()
 "
 ```
 
-### EKF not publishing `/odometry/filtered`
+### EKF odometry drifts / purple blob in RViz
+
+Without a velocity source (wheel encoders or visual odometry), the EKF
+cannot constrain position. Linear acceleration fusion is **disabled by
+default** in `ekf_params.yaml` to prevent unbounded drift.
+
+To enable (after adding wheel odometry):
+- Set `ax, ay, az` to `true` in `imu0_config` in `config/ekf_params.yaml`
+- Uncomment `odom0` wheel odometry section
 
 ```bash
 # Check if IMU topics are publishing
@@ -408,10 +450,20 @@ ros2 topic echo /diagnostics
 2. Move slowly — fast rotation causes motion blur
 3. Increase WT901 baud rate to 115200 for better IMU rate
 4. Check the D435i depth quality: `ros2 run rqt_image_view rqt_image_view`
+5. Use a **powered USB 3.0 hub** to prevent camera dropouts
+
+### Jetson USB Bus Layout (Orin Nano)
+
+```
+Bus 02 (USB 3.0, 10Gbps) ← D435i camera here
+Bus 01 (USB 2.0, 480Mbps) ← WT901 IMU + keyboard + Bluetooth
+```
+
+Keep the camera and IMU on **separate buses** for best stability.
 
 ---
 
-## 10. File Structure
+## 11. File Structure
 
 ```
 ros2_wit_d435/
@@ -419,6 +471,10 @@ ros2_wit_d435/
 ├── setup.py                         # Python package setup
 ├── setup.cfg                        # Install paths
 ├── resource/ros2_wit_d435           # ament index marker
+├── scripts/
+│   ├── startup_sensors.sh           # Sensors + RViz2
+│   ├── startup_mapping.sh           # SLAM mapping + RViz2
+│   └── startup_navigation.sh        # Nav2 navigation + RViz2
 ├── config/
 │   ├── ekf_params.yaml              # EKF sensor fusion config
 │   ├── rtabmap_params.yaml          # RTAB-Map SLAM config
