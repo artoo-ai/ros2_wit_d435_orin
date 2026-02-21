@@ -162,7 +162,7 @@ def generate_launch_description():
             'fixed_frame': 'base_link',
         }],
         remappings=[
-            ('imu/data_raw', '/camera/imu'),
+            ('imu/data_raw', '/camera/camera/imu'),
             ('imu/data', '/camera/imu/filtered'),
         ],
     )
@@ -193,8 +193,8 @@ def generate_launch_description():
             'output_frame_id': 'camera_depth_optical_frame',
         }],
         remappings=[
-            ('depth', '/camera/depth/image_rect_raw'),
-            ('depth_camera_info', '/camera/depth/camera_info'),
+            ('depth', '/camera/camera/depth/image_rect_raw'),
+            ('depth_camera_info', '/camera/camera/depth/camera_info'),
             ('scan', '/scan'),
         ],
     )

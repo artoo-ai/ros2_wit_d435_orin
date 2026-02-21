@@ -49,7 +49,7 @@ Visualization Manager:
       Name: Depth Image
       Enabled: true
       Topic:
-        Value: /camera/depth/image_rect_raw
+        Value: /camera/camera/depth/image_rect_raw
         Depth: 5
         Reliability Policy: Best Effort
       Max Value: 10
@@ -62,24 +62,17 @@ Visualization Manager:
       Name: Color Image
       Enabled: true
       Topic:
-        Value: /camera/color/image_raw
+        Value: /camera/camera/color/image_raw
         Depth: 5
         Reliability Policy: Best Effort
 
-    # ── IMU (WitMotion WT901) ────────────────────────────────────────
-    - Class: rviz_default_plugins/Imu
-      Name: WitMotion IMU
+    # ── IMU Orientation (via TF on imu_link) ────────────────────────
+    - Class: rviz_default_plugins/Axes
+      Name: IMU Axes
       Enabled: true
-      Topic:
-        Value: /imu/wit_data
-        Depth: 5
-        Reliability Policy: Best Effort
-      Box Alpha: 0.7
-      Acceleration Arrow Scale: 0.05
-      Acceleration Vector Color: 255; 0; 0
-      Enable Acceleration: true
-      Axes Length: 0.3
-      Axes Radius: 0.02
+      Length: 0.3
+      Radius: 0.02
+      Reference Frame: imu_link
 
     # ── Fused Odometry ───────────────────────────────────────────────
     - Class: rviz_default_plugins/Odometry
