@@ -1,0 +1,133 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+  - Class: rviz_common/Time
+    Name: Time
+
+Visualization Manager:
+  Class: ""
+  Displays:
+    # ── TF Frames ────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Frame Timeout: 15
+      Marker Scale: 0.5
+
+    # ── Robot Model ──────────────────────────────────────────────────
+    - Class: rviz_default_plugins/RobotModel
+      Name: Robot Model
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Depth: 5
+        Reliability Policy: Reliable
+
+    # ── LaserScan (from depthimage_to_laserscan) ─────────────────────
+    - Class: rviz_default_plugins/LaserScan
+      Name: LaserScan
+      Enabled: true
+      Topic:
+        Value: /scan
+        Depth: 5
+        Reliability Policy: Best Effort
+      Size (m): 0.03
+      Color Transformer: FlatColor
+      Color: 0; 255; 0
+      Style: Points
+      Min Color: 0; 0; 0
+      Max Color: 255; 255; 255
+
+    # ── Depth Image ──────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Image
+      Name: Depth Image
+      Enabled: true
+      Topic:
+        Value: /camera/depth/image_rect_raw
+        Depth: 5
+        Reliability Policy: Best Effort
+      Max Value: 10
+      Min Value: 0
+      Median window: 5
+      Normalize Range: true
+
+    # ── Color Image ──────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Image
+      Name: Color Image
+      Enabled: true
+      Topic:
+        Value: /camera/color/image_raw
+        Depth: 5
+        Reliability Policy: Best Effort
+
+    # ── IMU (WitMotion WT901) ────────────────────────────────────────
+    - Class: rviz_default_plugins/Imu
+      Name: WitMotion IMU
+      Enabled: true
+      Topic:
+        Value: /imu/wit_data
+        Depth: 5
+        Reliability Policy: Best Effort
+      Box Alpha: 0.7
+      Acceleration Arrow Scale: 0.05
+      Acceleration Vector Color: 255; 0; 0
+      Enable Acceleration: true
+      Axes Length: 0.3
+      Axes Radius: 0.02
+
+    # ── Fused Odometry ───────────────────────────────────────────────
+    - Class: rviz_default_plugins/Odometry
+      Name: Fused Odometry
+      Enabled: true
+      Topic:
+        Value: /odometry/filtered
+        Depth: 5
+        Reliability Policy: Reliable
+      Keep: 100
+      Arrow Length: 0.3
+      Color: 0; 170; 255
+      Position Tolerance: 0.1
+      Angle Tolerance: 0.1
+
+    # ── Grid ─────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 1
+      Line Style:
+        Value: Lines
+      Color: 100; 100; 100
+      Plane: XY
+      Plane Cell Count: 20
+
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: base_link
+    Frame Rate: 30
+
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+    - Class: rviz_default_plugins/SetInitialPose
+    - Class: rviz_default_plugins/SetGoal
+
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 3.0
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0.2
+      Pitch: 0.5
+      Yaw: 3.14
+      Name: Current View

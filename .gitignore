@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.whl
+
+# ROS2 build artifacts
+install/
+log/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ROS2 bags
+*.bag
+*.db3
+
+# RTAB-Map databases
+*.db
+
+# Compiled URDF
+*.urdf
+
+# pytest / testing
+.pytest_cache/
+.coverage
+htmlcov/

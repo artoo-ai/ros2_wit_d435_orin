@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>ros2_wit_d435</name>
+  <version>1.0.0</version>
+  <description>
+    Platform-agnostic ROS2 navigation node integrating Intel RealSense D435i
+    and WitMotion WT901 USB-C IMU for SLAM and autonomous navigation.
+    Designed for Nvidia Jetson Orin Nano Super.
+  </description>
+  <maintainer email="rico@todo.com">rico</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <!-- Core ROS2 -->
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+
+  <!-- Sensor drivers -->
+  <depend>realsense2_camera</depend>
+  <depend>imu_filter_madgwick</depend>
+
+  <!-- State estimation -->
+  <depend>robot_localization</depend>
+
+  <!-- SLAM -->
+  <depend>rtabmap_ros</depend>
+  <depend>rtabmap_odom</depend>
+  <depend>rtabmap_slam</depend>
+  <depend>rtabmap_viz</depend>
+
+  <!-- Navigation -->
+  <depend>nav2_bringup</depend>
+  <depend>nav2_bt_navigator</depend>
+  <depend>nav2_lifecycle_manager</depend>
+  <depend>nav2_map_server</depend>
+  <depend>nav2_controller</depend>
+  <depend>nav2_planner</depend>
+  <depend>nav2_behaviors</depend>
+  <depend>nav2_costmap_2d</depend>
+  <depend>nav2_waypoint_follower</depend>
+
+  <!-- Depth to scan conversion -->
+  <depend>depthimage_to_laserscan</depend>
+  <depend>pointcloud_to_laserscan</depend>
+
+  <!-- Robot model -->
+  <depend>robot_state_publisher</depend>
+  <depend>joint_state_publisher</depend>
+  <depend>xacro</depend>
+
+  <!-- Launch -->
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -1,0 +1,52 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# RealSense D435i Camera Parameters
+# Optimized for Jetson Orin Nano Super (power/performance balance)
+# ──────────────────────────────────────────────────────────────────────────────
+#
+# These are passed as overrides to the realsense2_camera rs_launch.py.
+# They can also be loaded as a params file.
+
+camera:
+  camera:
+    ros__parameters:
+      # ── Stream Configuration ──────────────────────────────────────────
+      # Depth stream
+      enable_depth: true
+      depth_module.depth_profile: "640x480x30"
+
+      # Color / RGB stream
+      enable_color: true
+      rgb_camera.color_profile: "640x480x30"
+
+      # Infrared streams (disabled to save bandwidth on Jetson)
+      enable_infra1: false
+      enable_infra2: false
+
+      # ── D435i Internal IMU ────────────────────────────────────────────
+      enable_accel: true
+      enable_gyro: true
+      unite_imu_method: "linear_interpolation"  # "copy" or "linear_interpolation"
+      enable_sync: true
+
+      # ── Depth Processing ──────────────────────────────────────────────
+      align_depth.enable: true               # Align depth to color frame
+      pointcloud.enable: false               # Disable — use depthimage_to_laserscan instead
+      allow_no_texture_points: true
+
+      # ── Post-Processing Filters ───────────────────────────────────────
+      spatial_filter.enable: true
+      temporal_filter.enable: true
+      decimation_filter.enable: true
+      hole_filling_filter.enable: false
+
+      # ── Device Settings ───────────────────────────────────────────────
+      initial_reset: true                    # Reset device on startup
+      json_file_path: ""                     # Optional: path to a preset JSON
+
+      # ── TF Frames ────────────────────────────────────────────────────
+      base_frame_id: "camera_link"
+      depth_frame_id: "camera_depth_frame"
+      color_frame_id: "camera_color_frame"
+      infra1_frame_id: "camera_infra1_frame"
+      infra2_frame_id: "camera_infra2_frame"
+      imu_frame_id: "camera_imu_frame"

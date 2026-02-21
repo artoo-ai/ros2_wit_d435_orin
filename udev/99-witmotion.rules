@@ -1,0 +1,26 @@
+# WitMotion WT901 USB-C IMU udev rules
+# Provides a consistent device symlink: /dev/witmotion_imu
+#
+# Installation:
+#   sudo cp 99-witmotion.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#   sudo udevadm trigger
+#
+# Finding your device attributes:
+#   udevadm info -a -n /dev/ttyUSB0 | grep '{idVendor}'
+#   udevadm info -a -n /dev/ttyUSB0 | grep '{idProduct}'
+#
+# The WitMotion WT901 USB-C typically uses a CH340/CH341 USB-UART chip.
+# Common vendor/product IDs: 1a86:7523  (QinHeng CH340)
+#
+# If your device uses a different chip, run the udevadm info command above
+# and update the idVendor/idProduct values accordingly.
+
+# CH340/CH341 (QinHeng) - most common WitMotion USB chip
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="witmotion_imu", MODE="0666"
+
+# CP2102 (Silicon Labs) - alternative USB chip used by some WitMotion models
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="witmotion_imu_cp2102", MODE="0666"
+
+# FTDI FT232R - another alternative
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="witmotion_imu_ftdi", MODE="0666"

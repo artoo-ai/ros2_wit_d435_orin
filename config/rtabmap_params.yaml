@@ -1,0 +1,125 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# RTAB-Map RGB-D SLAM Parameters
+# Adapted for RealSense D435i + fused EKF odometry (no robot-specific deps)
+# ──────────────────────────────────────────────────────────────────────────────
+
+rtabmap:
+  ros__parameters:
+
+    # ── Coordinate Frames ─────────────────────────────────────────────
+    frame_id: base_link
+    odom_frame_id: odom
+    map_frame_id: map
+
+    # ── Database ──────────────────────────────────────────────────────
+    database_path: ""                    # Set via launch argument
+    Mem/IncrementalMemory: true
+    Mem/InitWMWithAllNodes: false
+
+    # ── Subscriptions ─────────────────────────────────────────────────
+    subscribe_depth: true
+    subscribe_rgb: true
+    subscribe_stereo: false
+    subscribe_scan: true                 # LaserScan from depthimage_to_laserscan
+    subscribe_scan_cloud: false
+    subscribe_odom_info: false           # We use EKF odom, not visual odom info
+
+    # ── Synchronization ──────────────────────────────────────────────
+    queue_size: 30
+    qos: 2
+    approx_sync: true
+    approx_sync_max_interval: 0.0
+
+    # ── TF ────────────────────────────────────────────────────────────
+    wait_for_transform: 0.2
+    publish_tf: true
+
+    # ── Map Update Rate ───────────────────────────────────────────────
+    Rtabmap/DetectionRate: 1.0           # Hz
+    Rtabmap/TimeThr: 0
+    Rtabmap/MemoryThr: 0
+    Rtabmap/StartNewMapOnLoopClosure: false
+
+    # ── Loop Closure ──────────────────────────────────────────────────
+    Mem/NotLinkedNodesKept: true
+    Mem/STMSize: 30
+    Rtabmap/LoopThr: 0.11
+    Rtabmap/LoopRatio: 0.0
+
+    # ── Feature Detection ─────────────────────────────────────────────
+    Vis/CorType: 0                       # Features Matching
+    Vis/FeatureType: 6                   # GFTT (good for Jetson)
+    Vis/MaxFeatures: 500
+    Vis/MinInliers: 20
+    Vis/MaxDepth: 5.0
+    Vis/MinDepth: 0.3
+    Vis/EstimationType: 1                # PnP (3D→2D)
+
+    # ── RGBD / Odometry Integration ──────────────────────────────────
+    RGBD/Enabled: true
+    RGBD/LinearUpdate: 0.1               # Min displacement (m) for new node
+    RGBD/AngularUpdate: 0.1              # Min rotation (rad) for new node
+    RGBD/OptimizeFromGraphEnd: false
+    RGBD/OptimizeMaxError: 3.0
+
+    # ── Graph Optimization ────────────────────────────────────────────
+    Optimizer/Strategy: 1                # g2o
+    Optimizer/Iterations: 100
+    Optimizer/Slam2D: false              # Full 3D SLAM
+    Optimizer/Robust: true
+
+    # ── Registration ──────────────────────────────────────────────────
+    Reg/Strategy: 1                      # ICP
+    Reg/Force3DoF: false
+
+    # ── ICP ───────────────────────────────────────────────────────────
+    Icp/VoxelSize: 0.05
+    Icp/MaxCorrespondenceDistance: 0.1
+    Icp/Iterations: 30
+    Icp/Epsilon: 0.001
+    Icp/PointToPlane: true
+    Icp/PointToPlaneRadius: 0.3
+
+    # ── 2D Occupancy Grid (from depth) ────────────────────────────────
+    Grid/FromDepth: true
+    Grid/CellSize: 0.05
+    Grid/RangeMax: 5.0
+    Grid/RangeMin: 0.3
+    Grid/MaxObstacleHeight: 2.0
+    Grid/MaxGroundHeight: 0.1
+    Grid/ClusterRadius: 0.1
+    Grid/GroundIsObstacle: false
+    Grid/3D: false
+    GridGlobal/MinSize: 20.0
+
+    # ── Multi-session mapping ─────────────────────────────────────────
+    Mem/LocalizationDataSaved: true
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Visual Odometry (optional - used when no wheel odom is available)
+# ──────────────────────────────────────────────────────────────────────────────
+rgbd_odometry:
+  ros__parameters:
+    frame_id: base_link
+    odom_frame_id: vo_odom
+    publish_tf: false                    # EKF handles the TF
+    publish_null_when_lost: false
+    guess_frame_id: ""
+    wait_for_transform: 0.2
+    approx_sync: true
+    queue_size: 10
+    subscribe_rgbd: false
+
+    Odom/Strategy: 0                     # Frame-to-Map
+    Odom/ResetCountdown: 1
+    Vis/FeatureType: 6                   # GFTT
+    Vis/MaxFeatures: 1000
+    Vis/MinInliers: 20
+    Vis/MaxDepth: 5.0
+    Vis/MinDepth: 0.3
+    Vis/CorType: 0
+    Odom/FillInfoData: true
+    Odom/FilteringStrategy: 1           # Kalman
+    OdomF2M/MaxSize: 2000
+    Reg/Strategy: 1                      # ICP
+    Vis/EstimationType: 1                # PnP
