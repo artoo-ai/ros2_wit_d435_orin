@@ -136,6 +136,8 @@ class WitMotionIMUNode(Node):
                 stopbits=serial.STOPBITS_ONE,
                 timeout=0.01,
             )
+            self._serial.reset_input_buffer()  # Flush stale data
+            self._buffer.clear()               # Clear parse buffer
             self.get_logger().info(f'Opened serial port {self.port}')
         except serial.SerialException as e:
             self.get_logger().error(

@@ -219,17 +219,27 @@ ros2 launch ros2_wit_d435 sensors.launch.py baud_rate:=115200
 ### 5.1 Sensors Only (testing/debugging)
 
 ```bash
-ros2 launch ros2_wit_d435 sensors.launch.py
+# Terminal 1: Launch sensors
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+ros2 launch ros2_wit_d435 sensors.launch.py baud_rate:=115200
+```
+
+```bash
+# Terminal 2: Visualize in RViz2
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+rviz2 -d install/ros2_wit_d435/share/ros2_wit_d435/config/sensors_rviz.rviz
 ```
 
 Verify topics:
 
 ```bash
 ros2 topic list
-ros2 topic hz /imu/wit_data          # Should be ~100-200Hz
-ros2 topic hz /odometry/filtered     # Should be ~50Hz
-ros2 topic hz /camera/depth/image_rect_raw  # Should be ~30Hz
-ros2 topic hz /scan                  # Should be ~30Hz
+ros2 topic hz /imu/wit_data                        # Should be ~100-200Hz
+ros2 topic hz /odometry/filtered                    # Should be ~50Hz
+ros2 topic hz /camera/camera/depth/image_rect_raw   # Should be ~30Hz
+ros2 topic hz /scan                                 # Should be ~30Hz
 ```
 
 ### 5.2 SLAM Mapping Mode
@@ -238,7 +248,9 @@ Build a map of your environment:
 
 ```bash
 # Terminal 1: Sensors + SLAM
-ros2 launch ros2_wit_d435 bringup.launch.py mode:=mapping db_name:=my_map
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+ros2 launch ros2_wit_d435 bringup.launch.py mode:=mapping baud_rate:=115200 db_name:=my_map
 
 # Terminal 2: Drive the robot (via your platform node or teleop)
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
@@ -258,8 +270,11 @@ ros2 run nav2_map_server map_saver_cli -f ~/maps/my_map
 Navigate using a pre-built map:
 
 ```bash
+source /opt/ros/humble/setup.bash
+source install/setup.bash
 ros2 launch ros2_wit_d435 bringup.launch.py \
   mode:=navigation \
+  baud_rate:=115200 \
   map:=/home/rico/maps/my_map.yaml
 ```
 
@@ -270,10 +285,10 @@ Override camera/IMU positions for your specific robot:
 ```bash
 ros2 launch ros2_wit_d435 bringup.launch.py \
   mode:=mapping \
+  baud_rate:=115200 \
   cam_x:=0.10 cam_z:=0.30 \
   imu_x:=0.0 imu_z:=0.08 \
-  imu_port:=/dev/ttyUSB0 \
-  baud_rate:=115200
+  imu_port:=/dev/ttyUSB0
 ```
 
 ---
@@ -330,9 +345,9 @@ map
 | `/imu/wit_data` | `sensor_msgs/Imu` | WT901 driver | Accel + gyro + orientation |
 | `/imu/wit_mag` | `sensor_msgs/MagneticField` | WT901 driver | Magnetometer |
 | `/imu/wit_temperature` | `sensor_msgs/Temperature` | WT901 driver | Chip temperature |
-| `/camera/color/image_raw` | `sensor_msgs/Image` | RealSense | RGB image |
-| `/camera/depth/image_rect_raw` | `sensor_msgs/Image` | RealSense | Depth image |
-| `/camera/imu` | `sensor_msgs/Imu` | RealSense | D435i internal IMU |
+| `/camera/camera/color/image_raw` | `sensor_msgs/Image` | RealSense | RGB image |
+| `/camera/camera/depth/image_rect_raw` | `sensor_msgs/Image` | RealSense | Depth image |
+| `/camera/camera/imu` | `sensor_msgs/Imu` | RealSense | D435i internal IMU (if enabled) |
 | `/odometry/filtered` | `nav_msgs/Odometry` | EKF | Fused odometry |
 | `/scan` | `sensor_msgs/LaserScan` | depth_to_scan | Virtual laser scan |
 | `/map` | `nav_msgs/OccupancyGrid` | RTAB-Map | 2D occupancy grid |
@@ -381,7 +396,7 @@ s.close()
 ```bash
 # Check if IMU topics are publishing
 ros2 topic hz /imu/wit_data
-ros2 topic hz /camera/imu
+ros2 topic hz /camera/camera/imu
 
 # Check EKF diagnostics
 ros2 topic echo /diagnostics
@@ -408,7 +423,8 @@ ros2_wit_d435/
 │   ├── ekf_params.yaml              # EKF sensor fusion config
 │   ├── rtabmap_params.yaml          # RTAB-Map SLAM config
 │   ├── nav2_params.yaml             # Nav2 navigation config
-│   └── realsense_d435i.yaml         # D435i camera config
+│   ├── realsense_d435i.yaml         # D435i camera config
+│   └── sensors_rviz.rviz            # RViz2 visualization config
 ├── launch/
 │   ├── sensors.launch.py            # Sensors + EKF
 │   ├── slam.launch.py               # RTAB-Map SLAM
@@ -418,7 +434,7 @@ ros2_wit_d435/
 │   └── sensor_frames.urdf.xacro     # Sensor TF frames
 ├── ros2_wit_d435/
 │   ├── __init__.py
-│   └── witmotion_imu_node.py        # WT901 serial driver
+│   └── witmotion_imu_node.py        # WT901/WT901C serial driver
 ├── udev/
 │   └── 99-witmotion.rules           # Device rules
 └── README.md                        # This file

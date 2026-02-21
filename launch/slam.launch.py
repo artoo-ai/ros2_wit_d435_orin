@@ -40,8 +40,6 @@ def generate_launch_description():
                               description='RTAB-Map database name'),
         DeclareLaunchArgument('use_visual_odom', default_value='false',
                               description='Use visual odometry in addition to EKF'),
-        DeclareLaunchArgument('camera_ns', default_value='/camera',
-                              description='RealSense camera namespace'),
         DeclareLaunchArgument('localization', default_value='false',
                               description='Localization-only mode (use existing map)'),
         DeclareLaunchArgument('rviz', default_value='false',
@@ -50,9 +48,24 @@ def generate_launch_description():
 
     db_name = LaunchConfiguration('db_name')
     use_visual_odom = LaunchConfiguration('use_visual_odom')
-    camera_ns = LaunchConfiguration('camera_ns')
     localization = LaunchConfiguration('localization')
     with_rviz = LaunchConfiguration('rviz')
+
+    # ── Topic remappings (RealSense v4.56 uses /camera/camera/) ──────
+    camera_remappings = [
+        ('rgb/image', '/camera/camera/color/image_raw'),
+        ('rgb/camera_info', '/camera/camera/color/camera_info'),
+        ('depth/image', '/camera/camera/depth/image_rect_raw'),
+        ('scan', '/scan'),
+        ('odom', '/odometry/filtered'),
+    ]
+
+    vo_camera_remappings = [
+        ('rgb/image', '/camera/camera/color/image_raw'),
+        ('rgb/camera_info', '/camera/camera/color/camera_info'),
+        ('depth/image', '/camera/camera/depth/image_rect_raw'),
+        ('odom', '/vo_odom'),
+    ]
 
     # ── Visual Odometry (optional) ────────────────────────────────────
     visual_odom_node = Node(
@@ -62,12 +75,7 @@ def generate_launch_description():
         output='screen',
         condition=IfCondition(use_visual_odom),
         parameters=[rtabmap_config],
-        remappings=[
-            ('rgb/image', [camera_ns, '/color/image_raw']),
-            ('rgb/camera_info', [camera_ns, '/color/camera_info']),
-            ('depth/image', [camera_ns, '/depth/image_rect_raw']),
-            ('odom', '/vo_odom'),
-        ],
+        remappings=vo_camera_remappings,
         arguments=['--ros-args', '--log-level', 'warn'],
     )
 
@@ -90,16 +98,10 @@ def generate_launch_description():
                 'odom_frame_id': 'odom',
                 'map_frame_id': 'map',
                 'publish_tf': True,
-                'Mem/IncrementalMemory': True,
+                'Mem/IncrementalMemory': 'true',
             }
         ],
-        remappings=[
-            ('rgb/image', [camera_ns, '/color/image_raw']),
-            ('rgb/camera_info', [camera_ns, '/color/camera_info']),
-            ('depth/image', [camera_ns, '/depth/image_rect_raw']),
-            ('scan', '/scan'),
-            ('odom', '/odometry/filtered'),
-        ],
+        remappings=camera_remappings,
         arguments=['--delete_db_on_start', '--ros-args', '--log-level', 'warn'],
     )
 
@@ -122,13 +124,13 @@ def generate_launch_description():
                 'odom_frame_id': 'vo_odom',
                 'map_frame_id': 'map',
                 'publish_tf': True,
-                'Mem/IncrementalMemory': True,
+                'Mem/IncrementalMemory': 'true',
             }
         ],
         remappings=[
-            ('rgb/image', [camera_ns, '/color/image_raw']),
-            ('rgb/camera_info', [camera_ns, '/color/camera_info']),
-            ('depth/image', [camera_ns, '/depth/image_rect_raw']),
+            ('rgb/image', '/camera/camera/color/image_raw'),
+            ('rgb/camera_info', '/camera/camera/color/camera_info'),
+            ('depth/image', '/camera/camera/depth/image_rect_raw'),
             ('scan', '/scan'),
             ('odom', '/vo_odom'),
         ],
@@ -143,13 +145,7 @@ def generate_launch_description():
         output='screen',
         condition=IfCondition(with_rviz),
         parameters=[rtabmap_config],
-        remappings=[
-            ('rgb/image', [camera_ns, '/color/image_raw']),
-            ('rgb/camera_info', [camera_ns, '/color/camera_info']),
-            ('depth/image', [camera_ns, '/depth/image_rect_raw']),
-            ('scan', '/scan'),
-            ('odom', '/odometry/filtered'),
-        ],
+        remappings=camera_remappings,
     )
 
     return LaunchDescription(

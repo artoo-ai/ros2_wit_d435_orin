@@ -45,7 +45,7 @@ ekf_filter_node:
     # ── Sensor 1: RealSense D435i internal IMU ───────────────────────
     # Fuse only angular velocity and linear acceleration (differential
     # mode for orientation to avoid conflict with WT901).
-    imu1: /camera/imu
+    imu1: /camera/camera/imu
     imu1_config: [false, false, false,   # x, y, z (no)
                   true,  true,  true,    # roll, pitch, yaw (differential)
                   false, false, false,   # vx, vy, vz (no)
