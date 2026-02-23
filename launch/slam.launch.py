@@ -55,7 +55,7 @@ def generate_launch_description():
     camera_remappings = [
         ('rgb/image', '/camera/camera/color/image_raw'),
         ('rgb/camera_info', '/camera/camera/color/camera_info'),
-        ('depth/image', '/camera/camera/depth/image_rect_raw'),
+        ('depth/image', '/camera/camera/aligned_depth_to_color/image_raw'),
         ('scan', '/scan'),
         ('odom', '/odometry/filtered'),
     ]
@@ -63,7 +63,7 @@ def generate_launch_description():
     vo_camera_remappings = [
         ('rgb/image', '/camera/camera/color/image_raw'),
         ('rgb/camera_info', '/camera/camera/color/camera_info'),
-        ('depth/image', '/camera/camera/depth/image_rect_raw'),
+        ('depth/image', '/camera/camera/aligned_depth_to_color/image_raw'),
         ('odom', '/vo_odom'),
     ]
 
@@ -130,7 +130,7 @@ def generate_launch_description():
         remappings=[
             ('rgb/image', '/camera/camera/color/image_raw'),
             ('rgb/camera_info', '/camera/camera/color/camera_info'),
-            ('depth/image', '/camera/camera/depth/image_rect_raw'),
+            ('depth/image', '/camera/camera/aligned_depth_to_color/image_raw'),
             ('scan', '/scan'),
             ('odom', '/vo_odom'),
         ],

@@ -39,11 +39,8 @@
   <!-- Links                                                               -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
 
-  <!-- Base link (provided by platform-specific node or this default) -->
+  <!-- Base link (provided by EKF: odom → base_link) -->
   <link name="base_link"/>
-
-  <!-- Base footprint (ground plane projection) -->
-  <link name="base_footprint"/>
 
   <!-- Camera link (D435i body frame) -->
   <link name="camera_link"/>
@@ -55,12 +52,6 @@
   <!-- Joints (static transforms)                                         -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
 
-  <!-- base_footprint → base_link (ground to robot center) -->
-  <joint name="base_footprint_to_base" type="fixed">
-    <parent link="base_footprint"/>
-    <child  link="base_link"/>
-    <origin xyz="0 0 0.05" rpy="0 0 0"/>
-  </joint>
 
   <!-- base_link → camera_link -->
   <joint name="base_to_camera" type="fixed">

@@ -39,6 +39,7 @@ setup(
     entry_points={
         'console_scripts': [
             'witmotion_imu_node = ros2_wit_d435.witmotion_imu_node:main',
+            'depth_to_scan_node = ros2_wit_d435.depth_to_scan_node:main',
         ],
     },
 )

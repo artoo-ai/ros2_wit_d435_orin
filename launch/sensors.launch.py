@@ -122,13 +122,13 @@ def generate_launch_description():
             'enable_accel': enable_camera_imu,
             'enable_gyro': enable_camera_imu,
             'unite_imu_method': '2',
-            'enable_sync': 'true',
-            'align_depth.enable': 'true',
+            'enable_sync': 'false',
+            'align_depth.enable': 'false',
             'pointcloud.enable': 'false',
-            'spatial_filter.enable': 'true',
-            'temporal_filter.enable': 'true',
-            'decimation_filter.enable': 'true',
-            'depth_module.depth_profile': '640x480x30',
+            'spatial_filter.enable': 'false',
+            'temporal_filter.enable': 'false',
+            'decimation_filter.enable': 'false',
+            'depth_module.depth_profile': '480x270x30',
             'rgb_camera.color_profile': '640x480x30',
             'initial_reset': 'false',
         }.items(),
@@ -180,13 +180,15 @@ def generate_launch_description():
     )
 
     # 6) Depth Image to LaserScan (generates /scan from D435i depth)
+    #    Uses custom node that subscribes directly (no image_transport)
+    #    to avoid 0-height image bug in depthimage_to_laserscan package.
     depth_to_scan = Node(
-        package='depthimage_to_laserscan',
-        executable='depthimage_to_laserscan_node',
-        name='depthimage_to_laserscan',
+        package='ros2_wit_d435',
+        executable='depth_to_scan_node',
+        name='depth_to_scan',
         output='screen',
         parameters=[{
-            'scan_height': 1,            # Rows of pixels (1 = single scanline, safest)
+            'scan_height': 1,
             'scan_time': 0.033,
             'range_min': 0.3,
             'range_max': 8.0,
